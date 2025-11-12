@@ -81,7 +81,7 @@ function AngazaDashboard() {
   const handleClockIn = () => {
     setIsClockedIn(true)
     setClockInTime(new Date())
-    console.log("[v0] Clock in recorded to Firebase Firestore")
+    console.log("[v0] Clock in recorded to Firebase Firestore with project:", selectedProject)
   }
 
   const handleClockOut = () => {
@@ -113,9 +113,9 @@ function AngazaDashboard() {
     { id: "volunteers", label: "Personnel", icon: Users },
     { id: "donations", label: "Donations", icon: Heart },
     { id: "finance", label: "Finance", icon: DollarSign },
-    { id: "bookings", label: "Bookings", icon: Building },
+    // { id: "bookings", label: "Bookings", icon: Building },
     { id: "beneficiaries", label: "Beneficiaries", icon: UserCheck },
-    { id: "community-map", label: "Community Map", icon: MapPin },
+    // { id: "community-map", label: "Community Map", icon: MapPin },
     { id: "impact", label: "Impact Tracking", icon: TrendingUp },
     { id: "programs", label: "Program Portfolio", icon: Layers },
     { id: "resources", label: "Resource Distribution", icon: Package },
@@ -178,7 +178,7 @@ function AngazaDashboard() {
                   className="w-full shadow-sm font-medium"
                 >
                   <StopCircle className="w-4 h-4 mr-2" />
-                  Clock Out
+                  Cloc k Out
                 </Button>
               ) : (
                 <Dialog>
@@ -199,7 +199,7 @@ function AngazaDashboard() {
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="project">Project (Optional)</Label>
+                        <Label htmlFor="project">Project</Label>
                         <Select value={selectedProject} onValueChange={setSelectedProject}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a project" />
@@ -212,10 +212,19 @@ function AngazaDashboard() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <Button onClick={handleClockIn} className="w-full">
+                      <Button 
+                        onClick={handleClockIn} 
+                        className="w-full"
+                        disabled={!selectedProject}
+                      >
                         <PlayCircle className="w-4 h-4 mr-2" />
                         Start Working
                       </Button>
+                      {!selectedProject && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          Please select a project to continue
+                        </p>
+                      )}
                     </div>
                   </DialogContent>
                 </Dialog>

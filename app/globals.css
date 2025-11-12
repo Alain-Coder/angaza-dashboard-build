@@ -11,7 +11,7 @@
   --card-foreground: #1f2937;
   --popover: #ffffff;
   --popover-foreground: #1f2937;
-  --primary: #7c3aed;
+  --primary: #B900E8;
   --primary-foreground: #ffffff;
   --secondary: #f3f4f6;
   --secondary-foreground: #1f2937;
@@ -23,21 +23,27 @@
   --destructive-foreground: #ffffff;
   --border: #e5e7eb;
   --input: #ffffff;
-  --ring: rgba(124, 58, 237, 0.3);
-  --chart-1: #7c3aed;
+  --ring: rgba(185, 0, 232, 0.3);
+  --chart-1: #B900E8;
   --chart-2: #8b5cf6;
   --chart-3: #a78bfa;
   --chart-4: #c4b5fd;
   --chart-5: #e0e7ff;
   --radius: 0.625rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1f2937;
-  --sidebar-primary: #7c3aed;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar: #B900E8; /* Purple for light mode sidebar */
+  --sidebar-foreground: #ffffff; /* White text */
+  --sidebar-primary: #ffffff; /* White for active items in light mode */
+  --sidebar-primary-foreground: #B900E8; /* Purple text for active items in light mode */
   --sidebar-accent: #8b5cf6;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #e5e7eb;
-  --sidebar-ring: rgba(124, 58, 237, 0.3);
+  --sidebar-ring: rgba(185, 0, 232, 0.3);
+  /* Sidebar badge colors for better visibility */
+  --sidebar-badge-bg: rgba(255, 255, 255, 0.2);
+  --sidebar-badge-text: #ffffff;
+  /* Sidebar button colors */
+  --sidebar-button-border: rgba(255, 255, 255, 0.7); /* White border for better contrast */
+  --sidebar-button-hover: rgba(255, 255, 255, 0.2); /* White hover for better contrast */
 }
 
 .dark {
@@ -48,7 +54,7 @@
   --card-foreground: #e5e7eb;
   --popover: #1a1a2e;
   --popover-foreground: #e5e7eb;
-  --primary: #8b5cf6;
+  --primary: #B900E8;
   --primary-foreground: #ffffff;
   --secondary: #374151;
   --secondary-foreground: #e5e7eb;
@@ -60,20 +66,26 @@
   --destructive-foreground: #ffffff;
   --border: #374151;
   --input: #1a1a2e;
-  --ring: rgba(139, 92, 246, 0.3);
-  --chart-1: #8b5cf6;
+  --ring: rgba(185, 0, 232, 0.3);
+  --chart-1: #B900E8;
   --chart-2: #a78bfa;
   --chart-3: #c4b5fd;
   --chart-4: #ddd6fe;
   --chart-5: #ede9fe;
-  --sidebar: #1a1a2e;
-  --sidebar-foreground: #e5e7eb;
-  --sidebar-primary: #8b5cf6;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar: #4c1d95; /* Even darker purple for dark mode sidebar */
+  --sidebar-foreground: #ffffff; /* White text */
+  --sidebar-primary: #c4b5fd; /* Light purple for active items in dark mode */
+  --sidebar-primary-foreground: #ffffff; /* White text for active items in dark mode */
   --sidebar-accent: #a78bfa;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #374151;
-  --sidebar-ring: rgba(139, 92, 246, 0.3);
+  --sidebar-ring: rgba(185, 0, 232, 0.3);
+  /* Sidebar badge colors for better visibility */
+  --sidebar-badge-bg: rgba(196, 181, 253, 0.2);
+  --sidebar-badge-text: #ffffff;
+  /* Sidebar button colors for dark mode */
+  --sidebar-button-border: rgba(196, 181, 253, 0.7); /* Light purple border */
+  --sidebar-button-hover: rgba(196, 181, 253, 0.3); /* Light purple hover */
 }
 
 @theme inline {
@@ -115,6 +127,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-badge-bg: var(--sidebar-badge-bg);
+  --color-sidebar-badge-text: var(--sidebar-badge-text);
+  /* Sidebar button colors */
+  --color-sidebar-button-border: var(--sidebar-button-border);
+  --color-sidebar-button-hover: var(--sidebar-button-hover);
 }
 
 @layer base {
@@ -123,5 +140,70 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
+  }
+  
+  /* Ensure sidebar colors are applied correctly */
+  .bg-sidebar {
+    background-color: var(--color-sidebar) !important;
+  }
+  
+  .text-sidebar-foreground {
+    color: var(--color-sidebar-foreground) !important;
+  }
+  
+  .bg-sidebar-primary {
+    background-color: var(--color-sidebar-primary) !important;
+  }
+  
+  .text-sidebar-primary-foreground {
+    color: var(--color-sidebar-primary-foreground) !important;
+  }
+  
+  .bg-sidebar-accent {
+    background-color: var(--color-sidebar-accent) !important;
+  }
+  
+  .text-sidebar-accent-foreground {
+    color: var(--color-sidebar-accent-foreground) !important;
+  }
+  
+  .border-sidebar-border {
+    border-color: var(--color-sidebar-border) !important;
+  }
+  
+  /* Sidebar badge styles for better visibility */
+  .bg-sidebar-badge {
+    background-color: var(--color-sidebar-badge-bg) !important;
+  }
+  
+  .text-sidebar-badge-text {
+    color: var(--color-sidebar-badge-text) !important;
+  }
+  
+  /* Sidebar button styles for better visibility */
+  .border-sidebar-button {
+    border-color: var(--color-sidebar-button-border) !important;
+  }
+  
+  .hover\:bg-sidebar-button-hover:hover {
+    background-color: var(--color-sidebar-button-hover) !important;
+  }
+  
+  /* Custom scrollbar styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--color-sidebar-primary);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-sidebar-accent);
   }
 }

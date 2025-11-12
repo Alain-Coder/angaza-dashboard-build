@@ -94,9 +94,12 @@ The Angaza Foundation Dashboard is a full-featured web application built with mo
 #### 12. **Resource Distribution**
 - Supply chain management
 - Distribution tracking and logistics
-- Inventory management
+- Inventory management with stock control
 - Recipient verification
 - Distribution impact assessment
+- Real-time stock level monitoring
+- Automated stock depletion alerts
+- Comprehensive distribution history
 
 ### Partnership & Stakeholder Management
 
@@ -127,6 +130,13 @@ The Angaza Foundation Dashboard is a full-featured web application built with mo
 - Audit log tracking
 - Data backup and recovery
 - Security monitoring and 2FA support
+- File and document management
+  - Role-based file access
+  - Executive director oversight
+  - Upload and organization tools
+  - Folder hierarchy with subfolder support
+  - Grid and list view modes
+  - Rename, preview, and download capabilities
 
 ## 🛠 Technology Stack
 
@@ -147,6 +157,7 @@ The Angaza Foundation Dashboard is a full-featured web application built with mo
 ### External Integrations
 - **Pachangu** - Payment gateway for donations and event ticketing
 - **Vercel Analytics** - Performance and usage analytics
+- **Local File Storage** - Document management system
 
 ## 🎨 Design System
 
@@ -285,6 +296,13 @@ Configure Firestore security rules for production use.
 - Donations can be linked to specific projects or general fund
 - Partners can collaborate on multiple projects
 - Grants can fund multiple projects
+
+## 📚 Documentation
+
+For detailed information about specific features, see the documentation in the `docs` directory:
+
+- [File Management System](./docs/file-management.md)
+- [Resource Distribution System](./docs/resource-distribution.md)
 
 ## 🚀 Future Enhancements
 

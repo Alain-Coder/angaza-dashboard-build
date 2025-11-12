@@ -1,0 +1,83 @@
+import { NextResponse } from 'next/server'
+import { db } from '@/scripts/firebase-config'
+
+// GET /api/categories - Get all categories
+export async function GET() {
+  try {
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database not initialized' },
+        { status: 500 }
+      )
+    }
+
+    const categoriesSnapshot = await db.collection('categories').get()
+    const categories: any[] = []
+    
+    categoriesSnapshot.forEach((doc: any) => {
+      categories.push({
+        id: doc.id,
+        ...doc.data()
+      })
+    })
+    
+    return NextResponse.json({ categories })
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch categories' },
+      { status: 500 }
+    )
+  }
+}
+
+// POST /api/categories - Create a new category
+export async function POST(request: Request) {
+  try {
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database not initialized' },
+        { status: 500 }
+      )
+    }
+
+    const data = await request.json()
+    
+    // Validate required fields
+    if (!data.name) {
+      return NextResponse.json(
+        { error: 'Category name is required' },
+        { status: 400 }
+      )
+    }
+    
+    // Check if category already exists
+    const q = db.collection('categories').where('name', '==', data.name)
+    const querySnapshot = await q.get()
+    
+    if (!querySnapshot.empty) {
+      return NextResponse.json(
+        { error: 'Category already exists' },
+        { status: 400 }
+      )
+    }
+    
+    const newCategory = {
+      name: data.name,
+      createdAt: new Date()
+    }
+    
+    const docRef = await db.collection('categories').add(newCategory)
+    
+    return NextResponse.json({ 
+      id: docRef.id, 
+      ...newCategory 
+    })
+  } catch (error) {
+    console.error('Error creating category:', error)
+    return NextResponse.json(
+      { error: 'Failed to create category' },
+      { status: 500 }
+    )
+  }
+}
