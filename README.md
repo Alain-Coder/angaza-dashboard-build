@@ -169,8 +169,8 @@ The Angaza Foundation Dashboard is a full-featured web application built with mo
 - **Text**: Dark gray (#1f2937) for excellent contrast
 
 ### Typography
-- **Primary Font**: Geist Sans - Modern, readable sans-serif
-- **Monospace Font**: Geist Mono - For code and data display
+- **Primary Font**: System UI fonts - Modern, readable sans-serif
+- **Monospace Font**: System monospace fonts - For code and data display
 - **Font Weights**: Regular (400), Medium (500), Semibold (600), Bold (700)
 
 ### Layout

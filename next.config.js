@@ -13,6 +13,10 @@ const nextConfig = {
   output: 'standalone',
   // Enable react strict mode
   reactStrictMode: true,
+  // Fix for lightningcss issue
+  experimental: {
+    externalResolver: true,
+  },
   // Add redirects
   async redirects() {
     return [
