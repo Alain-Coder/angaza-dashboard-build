@@ -7,6 +7,11 @@ import { AuthProvider } from '@/contexts/auth-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'sonner'
 
+// Error boundary component
+function ErrorBoundary({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
+
 export const metadata: Metadata = {
   title: 'Angaza Foundation Dashboard',
   description: 'Empowering Communities Through Sustainable Development',
@@ -28,7 +33,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
