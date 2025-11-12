@@ -1,0 +1,16 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "github": {
+    "silent": true
+  },
+  "build": {
+    "env": {
+      "NEXT_PRIVATE_TARGET": "server"
+    }
+  }
+}
