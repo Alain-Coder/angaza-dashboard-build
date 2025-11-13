@@ -9,24 +9,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Add output tracing for better debugging
-  output: 'standalone',
-  // Enable react strict mode
-  reactStrictMode: true,
-  // Fix for lightningcss issue
-  experimental: {
-    externalResolver: true,
-  },
-  // Add redirects
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/dashboard',
-        permanent: false,
-      },
-    ]
-  },
 }
 
 module.exports = nextConfig

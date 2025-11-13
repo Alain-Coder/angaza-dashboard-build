@@ -2,16 +2,12 @@
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
-  "overrides": {
-    "lightningcss": "1.28.0",
-    "lightningcss-win32-x64-msvc": "npm:@lightningcss/linux-x64-gnu@1.28.0"
-  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "postinstall": "node -e \"if (process.platform !== 'win32') {const fs = require('fs'); const path = require('path'); const winPackage = path.join(process.cwd(), 'node_modules', '@next', 'swc-win32-x64-msvc'); const lightningPackage = path.join(process.cwd(), 'node_modules', 'lightningcss-win32-x64-msvc'); try { if (fs.existsSync(winPackage)) { fs.rmSync(winPackage, { recursive: true, force: true }); console.log('Removed Windows-specific package'); } if (fs.existsSync(lightningPackage)) { fs.rmSync(lightningPackage, { recursive: true, force: true }); console.log('Removed Windows-specific lightningcss package'); } } catch(e) { console.log('Could not remove Windows-specific packages:', e.message); }}\"",
+    "postinstall": "node -e \"if (process.platform !== 'win32') {try { require('fs').unlinkSync('node_modules/@next/swc-win32-x64-msvc'); console.log('Removed Windows-specific package'); } catch(e) {}}\"",
     "init-admin": "node scripts/init-admin.js",
     "init-departments": "node scripts/init-departments.js"
   },
