@@ -411,7 +411,13 @@ export default function FilesPage() {
     if (!user) return
     
     try {
-      const response = await fetch(`/api/users/list?currentUserId=${user.uid}`)
+      const response = await fetch('/api/users/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currentUserId: user.uid })
+      })
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))

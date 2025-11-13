@@ -31,8 +31,8 @@ if (hasFirebaseConfig) {
   console.log('Firebase environment variables not found')
 }
 
-// GET - Fetch all users for sharing dropdown
-export async function GET(request: Request) {
+// POST - Fetch all users for sharing dropdown
+export async function POST(request: Request) {
   try {
     if (!hasFirebaseConfig) {
       return NextResponse.json(
@@ -48,8 +48,8 @@ export async function GET(request: Request) {
       )
     }
 
-    const { searchParams } = new URL(request.url)
-    const currentUserId = searchParams.get('currentUserId')
+    // Parse the request body to get the current user ID
+    const { currentUserId } = await request.json()
     
     if (!currentUserId) {
       return NextResponse.json(
