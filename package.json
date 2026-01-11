@@ -1,15 +1,12 @@
 {
-  "name": "my-v0-project",
+  "name": "angaza-dashbooard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start",
-    "postinstall": "node -e \"if (process.platform !== 'win32') {try { require('fs').unlinkSync('node_modules/@next/swc-win32-x64-msvc'); console.log('Removed Windows-specific package'); } catch(e) {}}\"",
-    "init-admin": "node scripts/init-admin.js",
-    "init-departments": "node scripts/init-departments.js"
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

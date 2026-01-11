@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 interface RouteParams {
   params: {
@@ -43,6 +43,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     console.log('Request URL:', request.url)
     console.log('Params:', params)
     
+    const db = firebaseConfig.db;
     if (!db) {
       console.error('Firestore not initialized')
       return NextResponse.json(
@@ -114,6 +115,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     console.log('=== GET Category Request ===')
     console.log('Params:', params)
     
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

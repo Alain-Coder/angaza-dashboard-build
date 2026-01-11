@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/projects - Get all projects
 export async function GET() {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -39,6 +40,7 @@ export async function GET() {
 // POST /api/projects - Create a new project
 export async function POST(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

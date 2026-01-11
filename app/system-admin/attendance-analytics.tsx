@@ -479,8 +479,8 @@ export default function AttendanceAnalyticsContent() {
         record.userRole,
         getProgramName(record.programId),
         format(record.checkInTime, 'dd MMM, yyyy'),
-        format(record.checkInTime, 'HH:mm'),
-        record.checkOutTime ? format(record.checkOutTime, 'HH:mm') : 'N/A',
+        format(record.checkInTime, 'MMM dd, yyyy HH:mm'),
+        record.checkOutTime ? format(record.checkOutTime, 'MMM dd, yyyy HH:mm') : 'N/A',
         formatHoursWithMinutes(record.totalTime / 60).replace(',', ''), // Remove comma for CSV
         formatHoursWithMinutes(record.overtime / 60).replace(',', ''), // Remove comma for CSV
         record.status.replace('-', ' '),
@@ -926,7 +926,6 @@ export default function AttendanceAnalyticsContent() {
                 <TableHead>User</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Program</TableHead>
-                <TableHead>Date</TableHead>
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
                 <TableHead>Hours</TableHead>
@@ -945,12 +944,11 @@ export default function AttendanceAnalyticsContent() {
                   <TableCell>
                     <Badge variant="outline">{getProgramName(record.programId)}</Badge>
                   </TableCell>
-                  <TableCell>{format(record.checkInTime, 'MMM dd, yyyy')}</TableCell>
                   <TableCell className={isLateArrival(record) ? "font-medium text-red-600" : ""}>
-                    {format(record.checkInTime, 'HH:mm')}
+                    {format(record.checkInTime, 'MMM dd, yyyy HH:mm')}
                   </TableCell>
                   <TableCell>
-                    {record.checkOutTime ? format(record.checkOutTime, 'HH:mm') : 'N/A'}
+                    {record.checkOutTime ? format(record.checkOutTime, 'MMM dd, yyyy HH:mm') : 'N/A'}
                   </TableCell>
                   <TableCell>{formatHoursWithMinutes(record.totalTime / 60)}</TableCell>
                   <TableCell>

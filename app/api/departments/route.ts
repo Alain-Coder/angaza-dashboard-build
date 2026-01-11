@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/departments - Get all departments
 export async function GET() {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -37,6 +38,7 @@ export async function GET() {
 // POST /api/departments - Create a new department
 export async function POST(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

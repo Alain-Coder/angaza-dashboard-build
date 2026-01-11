@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 // Import from the shared firebase config instead of initializing separately
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/distributions - Get all distributions
 export async function GET(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -121,6 +122,7 @@ export async function GET(request: Request) {
 // POST /api/distributions - Create a new distribution
 export async function POST(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

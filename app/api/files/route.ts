@@ -13,25 +13,37 @@ const hasFirebaseConfig = process.env.FIREBASE_PROJECT_ID &&
                          process.env.FIREBASE_CLIENT_EMAIL;
 
 let db: admin.firestore.Firestore | null = null;
+let initialized = false;
 
-if (hasFirebaseConfig) {
-  try {
-    if (!getApps().length) {
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        }),
-      })
-    }
-    db = admin.firestore()
-  } catch (error) {
-    console.error('Failed to initialize Firebase Admin SDK:', error)
-    db = null
+// Function to initialize Firebase Admin SDK lazily
+function initializeFirebase() {
+  if (initialized) {
+    return db;
   }
-} else {
-  console.log('Firebase environment variables not found')
+
+  if (hasFirebaseConfig) {
+    try {
+      if (!getApps().length) {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\\\n/g, '\n'),
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          }),
+        })
+      }
+      db = admin.firestore()
+      initialized = true;
+    } catch (error) {
+      console.error('Failed to initialize Firebase Admin SDK:', error)
+      db = null
+    }
+  } else {
+    console.log('Firebase environment variables not found')
+    db = null;
+  }
+  
+  return db;
 }
 
 // Helper function to serialize Firestore data properly
@@ -66,6 +78,7 @@ function serializeFirestoreData(data: any) {
 // GET - Fetch files and folders for a user
 export async function GET(request: Request) {
   try {
+    const db = initializeFirebase();
     if (!hasFirebaseConfig) {
       return NextResponse.json(
         { error: 'Firebase configuration not found' },
@@ -177,6 +190,7 @@ export async function GET(request: Request) {
 // POST - Create a new file or folder record
 export async function POST(request: Request) {
   try {
+    const db = initializeFirebase();
     if (!hasFirebaseConfig) {
       return NextResponse.json(
         { error: 'Firebase configuration not found' },
@@ -290,6 +304,7 @@ export async function POST(request: Request) {
 // PUT - Update a file/folder record (rename)
 export async function PUT(request: Request) {
   try {
+    const db = initializeFirebase();
     if (!hasFirebaseConfig) {
       return NextResponse.json(
         { error: 'Firebase configuration not found' },
@@ -366,6 +381,7 @@ export async function PUT(request: Request) {
 // DELETE - Delete a file or folder record
 export async function DELETE(request: Request) {
   try {
+    const db = initializeFirebase();
     if (!hasFirebaseConfig) {
       return NextResponse.json(
         { error: 'Firebase configuration not found' },
@@ -467,6 +483,7 @@ export async function DELETE(request: Request) {
 // PATCH - Update sharing access for a file or folder
 export async function PATCH(request: Request) {
   try {
+    const db = initializeFirebase();
     if (!hasFirebaseConfig) {
       return NextResponse.json(
         { error: 'Firebase configuration not found' },
@@ -639,47 +656,71 @@ async function shareFolderContentsRecursively(folderId: string, sharedWith: stri
       throw new Error('Database not initialized');
     }
     
-    // Share all files in this folder
+    // Get all files in this folder (regardless of who owns them)
+    // Only files that are in this folder (folderId matches) should be included
     const filesInFolder = await db.collection('files')
       .where('folderId', '==', folderId)
-      .where('createdBy', '==', userId)
       .get()
     
-    // Share all subfolders in this folder
+    // Get all subfolders in this folder (regardless of who owns them)
+    // Only folders that are in this folder (parentId matches) should be included
     const foldersInFolder = await db.collection('folders')
       .where('parentId', '==', folderId)
-      .where('createdBy', '==', userId)
       .get()
     
-    // Update all files in this folder
-    const fileUpdatePromises = filesInFolder.docs.map(doc => {
+    // Update sharing for files owned by the current user
+    const fileUpdatePromises = filesInFolder.docs.map(async doc => {
       const fileData = doc.data()
-      // Merge existing sharedWith with new sharedWith, avoiding duplicates
-      const updatedSharedWith = Array.from(new Set([
-        ...(fileData.sharedWith || []), 
-        ...sharedWith
-      ]))
       
-      return db.collection('files').doc(doc.id).update({
-        sharedWith: updatedSharedWith
-      })
+      // Only update sharing if the file is owned by the current user
+      if (fileData.createdBy === userId) {
+        // Merge existing sharedWith with new sharedWith, avoiding duplicates
+        const updatedSharedWith = Array.from(new Set([
+          ...(fileData.sharedWith || []), 
+          ...sharedWith
+        ]))
+        
+        if (!db) {
+          throw new Error('Database not initialized');
+        }
+        
+        return db.collection('files').doc(doc.id).update({
+          sharedWith: updatedSharedWith
+        })
+      } else {
+        // If file is not owned by current user, don't modify its sharing
+        return Promise.resolve() // Return a resolved promise for consistency
+      }
     })
     
-    // Update all subfolders in this folder
+    // Update sharing for subfolders owned by the current user and process recursively
     const folderUpdatePromises = foldersInFolder.docs.map(async doc => {
       const folderData = doc.data()
-      // Merge existing sharedWith with new sharedWith, avoiding duplicates
-      const updatedSharedWith = Array.from(new Set([
-        ...(folderData.sharedWith || []), 
-        ...sharedWith
-      ]))
       
-      await db.collection('folders').doc(doc.id).update({
-        sharedWith: updatedSharedWith
-      })
-      
-      // Recursively share contents of this subfolder
-      return shareFolderContentsRecursively(doc.id, sharedWith, userId)
+      // Update sharing if the folder is owned by the current user
+      if (folderData.createdBy === userId) {
+        // Merge existing sharedWith with new sharedWith, avoiding duplicates
+        const updatedSharedWith = Array.from(new Set([
+          ...(folderData.sharedWith || []), 
+          ...sharedWith
+        ]))
+        
+        if (!db) {
+          throw new Error('Database not initialized');
+        }
+        
+        await db.collection('folders').doc(doc.id).update({
+          sharedWith: updatedSharedWith
+        })
+        
+        // Recursively share contents of this subfolder
+        return shareFolderContentsRecursively(doc.id, sharedWith, userId)
+      } else {
+        // If subfolder is not owned by current user, don't modify its sharing
+        // but still process its contents recursively if we have access
+        // Actually, for security, we shouldn't process contents of folders we don't own
+        return Promise.resolve() // Return a resolved promise for consistency
+      }
     })
     
     // Execute all updates

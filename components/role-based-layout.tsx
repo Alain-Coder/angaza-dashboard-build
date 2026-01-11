@@ -705,7 +705,13 @@ export function RoleBasedLayout({ children, roleName: propRoleName }: RoleBasedL
 
   const formatTime = (date: Date | null) => {
     if (!date) return 'N/A';
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleString([], { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
   };
 
   const getStatusColor = (status: string) => {

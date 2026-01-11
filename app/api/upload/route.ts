@@ -6,17 +6,43 @@ import admin from 'firebase-admin'
 import { getApps } from 'firebase-admin/app'
 
 // Initialize Firebase Admin SDK if not already initialized
-if (!getApps().length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    }),
-  })
-}
+let db: admin.firestore.Firestore | null = null;
+let initialized = false;
 
-const db = admin.firestore()
+// Function to initialize Firebase Admin SDK lazily
+function initializeFirebase() {
+  if (initialized) {
+    return db;
+  }
+
+  const hasFirebaseConfig = process.env.FIREBASE_PROJECT_ID && 
+                           process.env.FIREBASE_PRIVATE_KEY && 
+                           process.env.FIREBASE_CLIENT_EMAIL;
+
+  if (hasFirebaseConfig) {
+    try {
+      if (!getApps().length) {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\\\n/g, '\n'),
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          }),
+        })
+      }
+      db = admin.firestore()
+      initialized = true;
+    } catch (error) {
+      console.error('Failed to initialize Firebase Admin SDK:', error)
+      db = null
+    }
+  } else {
+    console.log('Firebase environment variables not found')
+    db = null;
+  }
+  
+  return db;
+}
 
 export async function POST(request: NextRequest) {
   try {

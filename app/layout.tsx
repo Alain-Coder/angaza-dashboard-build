@@ -11,9 +11,21 @@ function ErrorBoundary({ children }: { children: React.ReactNode }) {
 }
 
 export const metadata: Metadata = {
-  title: 'Angaza Foundation Dashboard',
-  description: 'Empowering Communities Through Sustainable Development',
-  generator: 'v0.app',
+  title: {
+    default: 'Angaza Foundation Dashboard',
+    template: '%s | Angaza Foundation Dashboard',
+  },
+  description: 'Internal dashboard for Angaza Foundation staff to manage operations',
+  metadataBase: new URL('https://dashboard.angazafoundation.org'),
+  openGraph: {
+    title: 'Angaza Foundation Dashboard',
+    description: 'Internal dashboard for Angaza Foundation staff to manage operations',
+    type: 'website',
+  },
+  robots: {
+    index: false, // Internal dashboard should not be indexed
+    follow: true,
+  },
 }
 
 export default function RootLayout({

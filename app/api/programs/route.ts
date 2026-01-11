@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/programs - Get all programs
 export async function GET() {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

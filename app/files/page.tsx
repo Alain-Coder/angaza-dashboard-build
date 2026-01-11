@@ -33,12 +33,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 import {
   Alert,
   AlertDescription,
@@ -235,24 +230,56 @@ export default function FilesPage() {
       
       if (folderId) {
         // When navigating into a specific folder, show all items in that folder
-        // This works because if the user can access the folder, they can access its contents
-        filteredSharedItems = allItems.filter(item => item.folderId === folderId);
+        // First, verify that the user has access to this specific folder
+        // This is done by checking if the folder itself was shared with the user
+        const targetFolder = allItems.find(item => 
+          item.id === folderId && 
+          item.type === 'folder' &&
+          item.sharedWith && 
+          Array.isArray(item.sharedWith) && 
+          item.sharedWith.includes(user.uid)
+        );
+        
+        if (targetFolder) {
+          // User has access to this folder (it was shared with them),
+          // so show all items in this folder
+          filteredSharedItems = allItems.filter(item => item.folderId === folderId);
+        } else {
+          // User doesn't have access to this folder, return empty
+          // This shouldn't happen in normal flow, but as a safety measure
+          filteredSharedItems = [];
+        }
       } else {
-        // For root level, show only items explicitly shared with user
-        // Show only root-level shared items (items with no parent folderId)
-        // This prevents nested items from appearing at the root level
-        filteredSharedItems = allItems.filter(item => 
-          Array.isArray(item.sharedWith) && item.sharedWith.includes(user.uid)
-        ).filter(item => {
-          // Show only items at root level (no parent folder)
-          return item.folderId === null || item.folderId === undefined;
-        })
+        // For root level, show items that are either:
+        // 1. Directly shared with the user (root level items)
+        // 2. Shared folders themselves (but not files inside shared folders at root level)
+        
+        // First, find all folders that are shared with the user
+        const sharedFolders = allItems.filter(item => {
+          return item.type === 'folder' && 
+                 item.sharedWith && 
+                 Array.isArray(item.sharedWith) && 
+                 item.sharedWith.includes(user.uid);
+        });
+        
+        // Then find files that are directly shared with the user (not inside shared folders)
+        const directlySharedFiles = allItems.filter(item => {
+          return item.type === 'file' && 
+                 item.sharedWith && 
+                 Array.isArray(item.sharedWith) && 
+                 item.sharedWith.includes(user.uid) &&
+                 // Only include files that are NOT inside shared folders
+                 !(item.folderId && 
+                   sharedFolders.some(folder => folder.id === item.folderId));
+        });
+        
+        // Combine shared folders and directly shared files only
+        filteredSharedItems = [...sharedFolders, ...directlySharedFiles];
       }
       
       setSharedItems(filteredSharedItems);
       setAllSharedItems(allItems);
       
-
     } catch (error: any) {
       console.error('Error fetching shared files:', error)
       setError(error.message || 'Failed to load shared files and folders')
@@ -899,7 +926,7 @@ export default function FilesPage() {
           type: sharingItem.type,
           sharedWith: sharingUsers,
           userId: user.uid,
-          // Enable recursive sharing for folders
+          // Enable recursive sharing for folders to ensure all nested content is shared
           recursive: sharingItem.type === 'folder'
         })
       })

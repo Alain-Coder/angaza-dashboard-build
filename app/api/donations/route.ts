@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/donations - Get all donations
 export async function GET(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -56,6 +57,7 @@ export async function GET(request: Request) {
 // POST /api/donations - Create a new donation
 export async function POST(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -100,6 +102,7 @@ export async function POST(request: Request) {
 // PUT /api/donations/[id] - Update a donation
 export async function PUT(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -147,6 +150,7 @@ export async function PUT(request: Request) {
 // DELETE /api/donations/[id] - Delete a donation
 export async function DELETE(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

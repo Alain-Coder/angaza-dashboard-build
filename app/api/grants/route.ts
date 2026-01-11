@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/grants - Get all grants
 export async function GET() {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -40,6 +41,7 @@ export async function GET() {
 // POST /api/grants - Create a new grant
 export async function POST(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -88,6 +90,7 @@ export async function POST(request: Request) {
 // PUT /api/grants/[id] - Update a grant
 export async function PUT(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -141,6 +144,7 @@ export async function PUT(request: Request) {
 // DELETE /api/grants/[id] - Delete a grant
 export async function DELETE(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

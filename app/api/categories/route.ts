@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/categories - Get all categories
 export async function GET() {
   try {
     console.log('=== GET All Categories Request ===')
     
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
   try {
     console.log('=== POST Category Request ===')
     
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

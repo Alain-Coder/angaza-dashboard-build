@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/scripts/firebase-config'
+import firebaseConfig from '@/scripts/firebase-config'
 
 // GET /api/resources - Get all resources
 export async function GET() {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -34,6 +35,7 @@ export async function GET() {
 // POST /api/resources - Create a new resource
 export async function POST(request: Request) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -76,6 +78,7 @@ export async function POST(request: Request) {
 // PUT /api/resources/[id] - Update a resource
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },
@@ -108,6 +111,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 // DELETE /api/resources/[id] - Delete a resource
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const db = firebaseConfig.db;
     if (!db) {
       return NextResponse.json(
         { error: 'Database not initialized' },

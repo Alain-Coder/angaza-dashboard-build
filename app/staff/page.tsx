@@ -32,6 +32,26 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+interface MedicalInfo {
+  existingConditions?: string
+  allergies?: string
+  medicalNotes?: string
+}
+
+interface NextOfKin {
+  fullName: string
+  relationship: string
+  phoneNumber: string
+  email?: string
+  address?: string
+}
+
+interface EmergencyContact {
+  fullName: string
+  relationship: string
+  phoneNumber: string
+}
+
 interface StaffMember {
   id: string
   name: string
@@ -44,6 +64,9 @@ interface StaffMember {
   address?: string
   dateOfBirth?: Date
   hireDate?: Date
+  medicalInfo?: MedicalInfo
+  nextOfKin?: NextOfKin
+  emergencyContact?: EmergencyContact
   isSystemUser?: boolean // New field to distinguish system users from non-system staff
 }
 
@@ -181,7 +204,18 @@ export default function StaffPage() {
     phoneNumber: '',
     address: '',
     dateOfBirth: '',
-    hireDate: ''
+    hireDate: '',
+    existingConditions: '',
+    allergies: '',
+    medicalNotes: '',
+    nextOfKinFullName: '',
+    nextOfKinRelationship: '',
+    nextOfKinPhoneNumber: '',
+    nextOfKinEmail: '',
+    nextOfKinAddress: '',
+    emergencyContactFullName: '',
+    emergencyContactRelationship: '',
+    emergencyContactPhoneNumber: ''
   })
   
   // New state for create form
@@ -195,7 +229,18 @@ export default function StaffPage() {
     address: '',
     dateOfBirth: '',
     hireDate: '',
-    role: 'employee' // Default role for non-system users
+    role: 'employee', // Default role for non-system users
+    existingConditions: '',
+    allergies: '',
+    medicalNotes: '',
+    nextOfKinFullName: '',
+    nextOfKinRelationship: '',
+    nextOfKinPhoneNumber: '',
+    nextOfKinEmail: '',
+    nextOfKinAddress: '',
+    emergencyContactFullName: '',
+    emergencyContactRelationship: '',
+    emergencyContactPhoneNumber: ''
   })
   
   // Search and pagination state
@@ -454,6 +499,9 @@ export default function StaffPage() {
               address: data.address || '',
               dateOfBirth: data.dateOfBirth?.toDate ? data.dateOfBirth.toDate() : undefined,
               hireDate: data.hireDate?.toDate ? data.hireDate.toDate() : undefined,
+              medicalInfo: data.medicalInfo || undefined,
+              nextOfKin: data.nextOfKin || undefined,
+              emergencyContact: data.emergencyContact || undefined,
               isSystemUser: true // Mark as system user
             });
           }
@@ -478,6 +526,9 @@ export default function StaffPage() {
             address: data.address || '',
             dateOfBirth: data.dateOfBirth?.toDate ? data.dateOfBirth.toDate() : undefined,
             hireDate: data.hireDate?.toDate ? data.hireDate.toDate() : undefined,
+            medicalInfo: data.medicalInfo || undefined,
+            nextOfKin: data.nextOfKin || undefined,
+            emergencyContact: data.emergencyContact || undefined,
             isSystemUser: false // Mark as non-system staff
           });
         });
@@ -690,7 +741,18 @@ export default function StaffPage() {
       phoneNumber: staff.phoneNumber || '',
       address: staff.address || '',
       dateOfBirth: staff.dateOfBirth ? format(staff.dateOfBirth, 'yyyy-MM-dd') : '',
-      hireDate: staff.hireDate ? format(staff.hireDate, 'yyyy-MM-dd') : ''
+      hireDate: staff.hireDate ? format(staff.hireDate, 'yyyy-MM-dd') : '',
+      existingConditions: staff.medicalInfo?.existingConditions || '',
+      allergies: staff.medicalInfo?.allergies || '',
+      medicalNotes: staff.medicalInfo?.medicalNotes || '',
+      nextOfKinFullName: staff.nextOfKin?.fullName || '',
+      nextOfKinRelationship: staff.nextOfKin?.relationship || '',
+      nextOfKinPhoneNumber: staff.nextOfKin?.phoneNumber || '',
+      nextOfKinEmail: staff.nextOfKin?.email || '',
+      nextOfKinAddress: staff.nextOfKin?.address || '',
+      emergencyContactFullName: staff.emergencyContact?.fullName || '',
+      emergencyContactRelationship: staff.emergencyContact?.relationship || '',
+      emergencyContactPhoneNumber: staff.emergencyContact?.phoneNumber || ''
     })
     setIsEditDialogOpen(true)
   }
@@ -724,6 +786,35 @@ export default function StaffPage() {
       
       if (editForm.hireDate) {
         updateData.hireDate = Timestamp.fromDate(new Date(editForm.hireDate))
+      }
+      
+      // Add medical information if any field is filled
+      if (editForm.existingConditions || editForm.allergies || editForm.medicalNotes) {
+        updateData.medicalInfo = {
+          existingConditions: editForm.existingConditions || '',
+          allergies: editForm.allergies || '',
+          medicalNotes: editForm.medicalNotes || ''
+        };
+      }
+      
+      // Add next of kin information if any field is filled
+      if (editForm.nextOfKinFullName || editForm.nextOfKinRelationship || editForm.nextOfKinPhoneNumber) {
+        updateData.nextOfKin = {
+          fullName: editForm.nextOfKinFullName || '',
+          relationship: editForm.nextOfKinRelationship || '',
+          phoneNumber: editForm.nextOfKinPhoneNumber || '',
+          email: editForm.nextOfKinEmail || '',
+          address: editForm.nextOfKinAddress || ''
+        };
+      }
+      
+      // Add emergency contact information if any field is filled
+      if (editForm.emergencyContactFullName || editForm.emergencyContactRelationship || editForm.emergencyContactPhoneNumber) {
+        updateData.emergencyContact = {
+          fullName: editForm.emergencyContactFullName || '',
+          relationship: editForm.emergencyContactRelationship || '',
+          phoneNumber: editForm.emergencyContactPhoneNumber || ''
+        };
       }
 
       await updateDoc(doc(db, 'users', editingStaff.id), updateData)
@@ -792,7 +883,18 @@ export default function StaffPage() {
       address: '',
       dateOfBirth: '',
       hireDate: '',
-      role: 'employee'
+      role: 'employee',
+      existingConditions: '',
+      allergies: '',
+      medicalNotes: '',
+      nextOfKinFullName: '',
+      nextOfKinRelationship: '',
+      nextOfKinPhoneNumber: '',
+      nextOfKinEmail: '',
+      nextOfKinAddress: '',
+      emergencyContactFullName: '',
+      emergencyContactRelationship: '',
+      emergencyContactPhoneNumber: ''
     })
     setIsCreateDialogOpen(true)
   }
@@ -831,6 +933,35 @@ export default function StaffPage() {
       
       if (createForm.hireDate) {
         staffData.hireDate = Timestamp.fromDate(new Date(createForm.hireDate));
+      }
+      
+      // Add medical information if any field is filled
+      if (createForm.existingConditions || createForm.allergies || createForm.medicalNotes) {
+        staffData.medicalInfo = {
+          existingConditions: createForm.existingConditions || '',
+          allergies: createForm.allergies || '',
+          medicalNotes: createForm.medicalNotes || ''
+        };
+      }
+      
+      // Add next of kin information if any field is filled
+      if (createForm.nextOfKinFullName || createForm.nextOfKinRelationship || createForm.nextOfKinPhoneNumber) {
+        staffData.nextOfKin = {
+          fullName: createForm.nextOfKinFullName || '',
+          relationship: createForm.nextOfKinRelationship || '',
+          phoneNumber: createForm.nextOfKinPhoneNumber || '',
+          email: createForm.nextOfKinEmail || '',
+          address: createForm.nextOfKinAddress || ''
+        };
+      }
+      
+      // Add emergency contact information if any field is filled
+      if (createForm.emergencyContactFullName || createForm.emergencyContactRelationship || createForm.emergencyContactPhoneNumber) {
+        staffData.emergencyContact = {
+          fullName: createForm.emergencyContactFullName || '',
+          relationship: createForm.emergencyContactRelationship || '',
+          phoneNumber: createForm.emergencyContactPhoneNumber || ''
+        };
       }
 
       // Add to staff collection for non-system users
@@ -1276,7 +1407,6 @@ export default function StaffPage() {
                 <TableHeader>
                   <TableRow>
                     {!shouldOnlySeeTimesheets() && <TableHead>Staff Member</TableHead>}
-                    <TableHead>Date</TableHead>
                     <TableHead>Check In</TableHead>
                     <TableHead>Check Out</TableHead>
                     <TableHead>Hours</TableHead>
@@ -1292,11 +1422,8 @@ export default function StaffPage() {
                       {!shouldOnlySeeTimesheets() && (
                         <TableCell className="font-medium text-foreground">{timesheet.userName}</TableCell>
                       )}
-                      <TableCell className="text-muted-foreground">
-                        {format(timesheet.date, 'MMM dd, yyyy')}
-                      </TableCell>
                       <TableCell className={isLateArrival(timesheet) ? "font-medium text-red-600" : "text-muted-foreground"}>
-                        {format(timesheet.checkInTime, 'HH:mm')}
+                        {format(timesheet.checkInTime, 'MMM dd, yyyy HH:mm')}
                         {isLateArrival(timesheet) && (
                           <span className="ml-2 text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
                             Late
@@ -1304,7 +1431,7 @@ export default function StaffPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {timesheet.checkOutTime ? format(timesheet.checkOutTime, 'HH:mm') : 'N/A'}
+                        {timesheet.checkOutTime ? format(timesheet.checkOutTime, 'MMM dd, yyyy HH:mm') : 'N/A'}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {formatHoursWithMinutes(timesheet.hoursWorked)}
@@ -1426,7 +1553,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="email" className="text-right">
                   Email
@@ -1441,7 +1568,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="department" className="text-right">
                   Department
@@ -1464,7 +1591,7 @@ export default function StaffPage() {
                   </Select>
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="position" className="text-right">
                   Position
@@ -1478,7 +1605,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="phoneNumber" className="text-right">
                   Phone
@@ -1492,7 +1619,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="address" className="text-right">
                   Address
@@ -1506,7 +1633,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="dateOfBirth" className="text-right">
                   D.O.B
@@ -1521,7 +1648,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="hireDate" className="text-right">
                   Hire Date
@@ -1536,7 +1663,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="status" className="text-right">
                   Status
@@ -1554,6 +1681,186 @@ export default function StaffPage() {
                       <SelectItem value="Inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+                      
+              {/* Medical Information Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Medical Information</h3>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="existingConditions" className="text-right">
+                    Conditions
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="existingConditions"
+                      value={editForm.existingConditions}
+                      onChange={(e) => setEditForm({...editForm, existingConditions: e.target.value})}
+                      className="w-full"
+                      placeholder="List any existing medical conditions"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="allergies" className="text-right">
+                    Allergies
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="allergies"
+                      value={editForm.allergies}
+                      onChange={(e) => setEditForm({...editForm, allergies: e.target.value})}
+                      className="w-full"
+                      placeholder="List any allergies"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="medicalNotes" className="text-right">
+                    Notes
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="medicalNotes"
+                      value={editForm.medicalNotes}
+                      onChange={(e) => setEditForm({...editForm, medicalNotes: e.target.value})}
+                      className="w-full"
+                      placeholder="Any additional medical notes"
+                    />
+                  </div>
+                </div>
+              </div>
+                      
+              {/* Next of Kin Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Next of Kin</h3>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="nextOfKinFullName" className="text-right">
+                    Full Name
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="nextOfKinFullName"
+                      value={editForm.nextOfKinFullName}
+                      onChange={(e) => setEditForm({...editForm, nextOfKinFullName: e.target.value})}
+                      className="w-full"
+                      placeholder="Full name of next of kin"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="nextOfKinRelationship" className="text-right">
+                    Relationship
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="nextOfKinRelationship"
+                      value={editForm.nextOfKinRelationship}
+                      onChange={(e) => setEditForm({...editForm, nextOfKinRelationship: e.target.value})}
+                      className="w-full"
+                      placeholder="Relationship to staff member"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="nextOfKinPhoneNumber" className="text-right">
+                    Phone
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="nextOfKinPhoneNumber"
+                      value={editForm.nextOfKinPhoneNumber}
+                      onChange={(e) => setEditForm({...editForm, nextOfKinPhoneNumber: e.target.value})}
+                      className="w-full"
+                      placeholder="Phone number"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="nextOfKinEmail" className="text-right">
+                    Email
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="nextOfKinEmail"
+                      value={editForm.nextOfKinEmail}
+                      onChange={(e) => setEditForm({...editForm, nextOfKinEmail: e.target.value})}
+                      className="w-full"
+                      placeholder="Email (optional)"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="nextOfKinAddress" className="text-right">
+                    Address
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="nextOfKinAddress"
+                      value={editForm.nextOfKinAddress}
+                      onChange={(e) => setEditForm({...editForm, nextOfKinAddress: e.target.value})}
+                      className="w-full"
+                      placeholder="Address (optional)"
+                    />
+                  </div>
+                </div>
+              </div>
+                      
+              {/* Emergency Contact Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Emergency Contact</h3>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="emergencyContactFullName" className="text-right">
+                    Full Name
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="emergencyContactFullName"
+                      value={editForm.emergencyContactFullName}
+                      onChange={(e) => setEditForm({...editForm, emergencyContactFullName: e.target.value})}
+                      className="w-full"
+                      placeholder="Full name of emergency contact"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="emergencyContactRelationship" className="text-right">
+                    Relationship
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="emergencyContactRelationship"
+                      value={editForm.emergencyContactRelationship}
+                      onChange={(e) => setEditForm({...editForm, emergencyContactRelationship: e.target.value})}
+                      className="w-full"
+                      placeholder="Relationship to staff member"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="emergencyContactPhoneNumber" className="text-right">
+                    Phone
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="emergencyContactPhoneNumber"
+                      value={editForm.emergencyContactPhoneNumber}
+                      onChange={(e) => setEditForm({...editForm, emergencyContactPhoneNumber: e.target.value})}
+                      className="w-full"
+                      placeholder="Phone number (primary)"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1594,7 +1901,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-email" className="text-right">
                   Email
@@ -1610,7 +1917,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-department" className="text-right">
                   Department
@@ -1633,7 +1940,7 @@ export default function StaffPage() {
                   </Select>
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-position" className="text-right">
                   Position
@@ -1648,7 +1955,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-            
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-phoneNumber" className="text-right">
                   Phone
@@ -1663,7 +1970,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-address" className="text-right">
                   Address
@@ -1678,7 +1985,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-dateOfBirth" className="text-right">
                   D.O.B
@@ -1693,7 +2000,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-hireDate" className="text-right">
                   Hire Date
@@ -1708,7 +2015,7 @@ export default function StaffPage() {
                   />
                 </div>
               </div>
-              
+                      
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="create-status" className="text-right">
                   Status
@@ -1726,6 +2033,186 @@ export default function StaffPage() {
                       <SelectItem value="Inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+                      
+              {/* Medical Information Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Medical Information</h3>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-existingConditions" className="text-right">
+                    Conditions
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="create-existingConditions"
+                      value={createForm.existingConditions}
+                      onChange={(e) => setCreateForm({...createForm, existingConditions: e.target.value})}
+                      className="w-full"
+                      placeholder="List any existing medical conditions"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-allergies" className="text-right">
+                    Allergies
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="create-allergies"
+                      value={createForm.allergies}
+                      onChange={(e) => setCreateForm({...createForm, allergies: e.target.value})}
+                      className="w-full"
+                      placeholder="List any allergies"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="create-medicalNotes" className="text-right">
+                    Notes
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="create-medicalNotes"
+                      value={createForm.medicalNotes}
+                      onChange={(e) => setCreateForm({...createForm, medicalNotes: e.target.value})}
+                      className="w-full"
+                      placeholder="Any additional medical notes"
+                    />
+                  </div>
+                </div>
+              </div>
+                      
+              {/* Next of Kin Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Next of Kin</h3>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-nextOfKinFullName" className="text-right">
+                    Full Name
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-nextOfKinFullName"
+                      value={createForm.nextOfKinFullName}
+                      onChange={(e) => setCreateForm({...createForm, nextOfKinFullName: e.target.value})}
+                      className="w-full"
+                      placeholder="Full name of next of kin"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-nextOfKinRelationship" className="text-right">
+                    Relationship
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-nextOfKinRelationship"
+                      value={createForm.nextOfKinRelationship}
+                      onChange={(e) => setCreateForm({...createForm, nextOfKinRelationship: e.target.value})}
+                      className="w-full"
+                      placeholder="Relationship to staff member"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-nextOfKinPhoneNumber" className="text-right">
+                    Phone
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-nextOfKinPhoneNumber"
+                      value={createForm.nextOfKinPhoneNumber}
+                      onChange={(e) => setCreateForm({...createForm, nextOfKinPhoneNumber: e.target.value})}
+                      className="w-full"
+                      placeholder="Phone number"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-nextOfKinEmail" className="text-right">
+                    Email
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-nextOfKinEmail"
+                      value={createForm.nextOfKinEmail}
+                      onChange={(e) => setCreateForm({...createForm, nextOfKinEmail: e.target.value})}
+                      className="w-full"
+                      placeholder="Email (optional)"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="create-nextOfKinAddress" className="text-right">
+                    Address
+                  </Label>
+                  <div className="col-span-3">
+                    <Textarea
+                      id="create-nextOfKinAddress"
+                      value={createForm.nextOfKinAddress}
+                      onChange={(e) => setCreateForm({...createForm, nextOfKinAddress: e.target.value})}
+                      className="w-full"
+                      placeholder="Address (optional)"
+                    />
+                  </div>
+                </div>
+              </div>
+                      
+              {/* Emergency Contact Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">Emergency Contact</h3>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-emergencyContactFullName" className="text-right">
+                    Full Name
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-emergencyContactFullName"
+                      value={createForm.emergencyContactFullName}
+                      onChange={(e) => setCreateForm({...createForm, emergencyContactFullName: e.target.value})}
+                      className="w-full"
+                      placeholder="Full name of emergency contact"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4 mb-4">
+                  <Label htmlFor="create-emergencyContactRelationship" className="text-right">
+                    Relationship
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-emergencyContactRelationship"
+                      value={createForm.emergencyContactRelationship}
+                      onChange={(e) => setCreateForm({...createForm, emergencyContactRelationship: e.target.value})}
+                      className="w-full"
+                      placeholder="Relationship to staff member"
+                    />
+                  </div>
+                </div>
+                        
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="create-emergencyContactPhoneNumber" className="text-right">
+                    Phone
+                  </Label>
+                  <div className="col-span-3">
+                    <Input
+                      id="create-emergencyContactPhoneNumber"
+                      value={createForm.emergencyContactPhoneNumber}
+                      onChange={(e) => setCreateForm({...createForm, emergencyContactPhoneNumber: e.target.value})}
+                      className="w-full"
+                      placeholder="Phone number (primary)"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1781,7 +2268,7 @@ export default function StaffPage() {
                       </div>
                     </div>
                   </div>
-                  
+                          
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Work Information</h3>
                     <div className="space-y-2">
@@ -1837,6 +2324,87 @@ export default function StaffPage() {
                     </div>
                   </div>
                 </div>
+                        
+                {/* Medical Information Section */}
+                {(viewingStaff.medicalInfo?.existingConditions || viewingStaff.medicalInfo?.allergies || viewingStaff.medicalInfo?.medicalNotes) && (
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Medical Information</h3>
+                    <div className="space-y-2">
+                      {viewingStaff.medicalInfo.existingConditions && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Existing Conditions</p>
+                          <p className="text-foreground">{viewingStaff.medicalInfo.existingConditions}</p>
+                        </div>
+                      )}
+                      {viewingStaff.medicalInfo.allergies && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Allergies</p>
+                          <p className="text-foreground">{viewingStaff.medicalInfo.allergies}</p>
+                        </div>
+                      )}
+                      {viewingStaff.medicalInfo.medicalNotes && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Medical Notes</p>
+                          <p className="text-foreground">{viewingStaff.medicalInfo.medicalNotes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                        
+                {/* Next of Kin Section */}
+                {viewingStaff.nextOfKin && (
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Next of Kin</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Full Name</p>
+                        <p className="text-foreground">{viewingStaff.nextOfKin.fullName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Relationship</p>
+                        <p className="text-foreground">{viewingStaff.nextOfKin.relationship}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone Number</p>
+                        <p className="text-foreground">{viewingStaff.nextOfKin.phoneNumber}</p>
+                      </div>
+                      {viewingStaff.nextOfKin.email && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Email</p>
+                          <p className="text-foreground">{viewingStaff.nextOfKin.email}</p>
+                        </div>
+                      )}
+                      {viewingStaff.nextOfKin.address && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Address</p>
+                          <p className="text-foreground">{viewingStaff.nextOfKin.address}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                        
+                {/* Emergency Contact Section */}
+                {viewingStaff.emergencyContact && (
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Emergency Contact</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Full Name</p>
+                        <p className="text-foreground">{viewingStaff.emergencyContact.fullName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Relationship</p>
+                        <p className="text-foreground">{viewingStaff.emergencyContact.relationship}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone Number</p>
+                        <p className="text-foreground">{viewingStaff.emergencyContact.phoneNumber}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </DialogContent>
@@ -1862,17 +2430,13 @@ export default function StaffPage() {
                         <p className="text-foreground">{viewingTimesheet.userName}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Date</p>
-                        <p className="text-foreground">{format(viewingTimesheet.date, 'MMMM d, yyyy')}</p>
-                      </div>
-                      <div>
                         <p className="text-sm text-muted-foreground">Check In</p>
-                        <p className="text-foreground">{format(viewingTimesheet.checkInTime, 'HH:mm')}</p>
+                        <p className="text-foreground">{format(viewingTimesheet.checkInTime, 'MMM dd, yyyy HH:mm')}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Check Out</p>
                         <p className="text-foreground">
-                          {viewingTimesheet.checkOutTime ? format(viewingTimesheet.checkOutTime, 'HH:mm') : 'N/A'}
+                          {viewingTimesheet.checkOutTime ? format(viewingTimesheet.checkOutTime, 'MMM dd, yyyy HH:mm') : 'N/A'}
                         </p>
                       </div>
                       <div>
